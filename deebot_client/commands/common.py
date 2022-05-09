@@ -2,6 +2,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Mapping, Optional, Union
+import xmltodict
 
 from ..command import Command
 from ..events import EnableEvent
@@ -45,6 +46,10 @@ class CommandWithHandling(Command, Message, ABC):
         """
         if response.get("ret") == "ok":
             data = response.get("resp", response)
+            try:
+                data = xmltodict.parse(data, attr_prefix="").get("ctl")
+            except:
+                pass
             result = self.handle(event_bus, data)
             return CommandResult(result.state, result.args)
 

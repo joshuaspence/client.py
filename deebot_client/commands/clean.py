@@ -36,7 +36,16 @@ class Clean(_ExecuteCommand):
     name = "clean"
 
     def __init__(self, action: CleanAction) -> None:
-        args = {"act": action.value}
+        match action:
+            case CleanAction.START:
+                act = "s"
+            case CleanAction.PAUSE:
+                act = "p"
+            case CleanAction.RESUME:
+                act = "r"
+            case CleanAction.STOP:
+                act = "h"
+        args = {"act": act}
         if action == CleanAction.START:
             args["type"] = CleanMode.AUTO.value
         super().__init__(args)
@@ -58,7 +67,7 @@ class CleanArea(Clean):
 class GetCleanInfo(_NoArgsCommand):
     """Get clean info command."""
 
-    name = "getCleanInfo"
+    name = "getCleanState"
 
     @classmethod
     def _handle_body_data_dict(

@@ -2,6 +2,7 @@
 from datetime import datetime
 from typing import Any, Union
 from urllib.parse import urljoin
+import xmltodict
 
 from ._api_client import _InternalApiClient
 from .authentication import Authenticator
@@ -97,21 +98,15 @@ class ApiClient:
             path = PATH_API_LG_LOG
         else:
             payload = {
-                "header": {
-                    "pri": "1",
-                    "ts": datetime.now().timestamp(),
-                    "tzm": 480,
-                    "ver": "0.0.50",
-                }
+                "ctl": {
+                    command.name: command.args,
+                },
             }
 
-            if len(command.args) > 0:
-                payload["body"] = {"data": command.args}
-
             json = {
-                "cmdName": command.name,
-                "payload": payload,
-                "payloadType": "j",
+                "cmdName": command.name[0].upper() + command.name[1:],
+                "payload": xmltodict.unparse(payload, attr_prefix="", full_document=False),
+                "payloadType": "x",
                 "td": "q",
                 "toId": device_info.did,
                 "toRes": device_info.resource,

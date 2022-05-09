@@ -9,7 +9,7 @@ from ..message import HandlingResult, Message
 class OnBattery(Message):
     """On battery message."""
 
-    name = "onBattery"
+    name = "batteryInfo"
 
     @classmethod
     def _handle_body_data_dict(
@@ -19,5 +19,5 @@ class OnBattery(Message):
 
         :return: A message response
         """
-        event_bus.notify(BatteryEvent(data["value"]))
+        event_bus.notify(BatteryEvent(int(data["battery"]["power"])))
         return HandlingResult.success()

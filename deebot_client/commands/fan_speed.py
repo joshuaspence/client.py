@@ -20,7 +20,7 @@ class FanSpeedLevel(DisplayNameIntEnum):
 class GetFanSpeed(_NoArgsCommand):
     """Get fan speed command."""
 
-    name = "getSpeed"
+    name = "getCleanSpeed"
 
     @classmethod
     def _handle_body_data_dict(
@@ -30,6 +30,8 @@ class GetFanSpeed(_NoArgsCommand):
 
         :return: A message response
         """
+        if data["speed"] == "strong":
+            data["speed"] = FanSpeedLevel.MAX
         event_bus.notify(FanSpeedEvent(FanSpeedLevel(int(data["speed"])).display_name))
         return HandlingResult.success()
 

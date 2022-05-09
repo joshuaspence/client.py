@@ -9,7 +9,7 @@ from ..message import HandlingResult, Message
 class ReportStats(Message):
     """Report stats message."""
 
-    name = "reportStats"
+    name = "chargeState"
 
     @classmethod
     def _handle_body_data_dict(

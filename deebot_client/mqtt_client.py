@@ -2,6 +2,7 @@
 import json
 import ssl
 from typing import MutableMapping, Optional
+import xmltodict
 
 from cachetools import TTLCache
 from gmqtt import Client, Subscription
@@ -18,19 +19,11 @@ _LOGGER = get_logger(__name__)
 
 
 def _get_subscriptions(device_info: DeviceInfo) -> list[Subscription]:
+    _LOGGER.debug('FOOBAR')
+
     return [
-        # iot/atr/[command]]/[did]]/[class]]/[resource]/j
         Subscription(
-            f"iot/atr/+/{device_info.did}/{device_info.get_class}/{device_info.resource}/j"
-        ),
-        # iot/p2p/[command]]/[sender did]/[sender class]]/[sender resource]
-        # /[receiver did]/[receiver class]]/[receiver resource]/[q|p/[request id/j
-        # [q|p] q-> request p-> response
-        Subscription(
-            f"iot/p2p/+/+/+/+/{device_info.did}/{device_info.get_class}/{device_info.resource}/q/+/j"
-        ),
-        Subscription(
-            f"iot/p2p/+/{device_info.did}/{device_info.get_class}/{device_info.resource}/+/+/+/p/+/j"
+            f"iot/atr/+/{device_info.did}/{device_info.get_class}/{device_info.resource}/+"
         ),
     ]
 
@@ -120,7 +113,8 @@ class MqttClient:
         try:
             bot = self._subscribers.get(topic_split[3])
             if bot:
-                data = json.loads(payload)
+                #data = json.loads(payload)
+                data = {"body": xmltodict.parse(payload, attr_prefix="")['ctl']}
                 await bot.handle_message(topic_split[2], data)
         except Exception:  # pylint: disable=broad-except
             _LOGGER.error(

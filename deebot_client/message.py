@@ -49,6 +49,7 @@ def _handle_error_or_analyse(
         cls: type["Message"], event_bus: EventBus, data: dict[str, Any]
     ) -> HandlingResult:
         try:
+            _LOGGER.debug("Handling message: %s", data)
             response = func(cls, event_bus, data)
             if response.state == HandlingState.ANALYSE:
                 _LOGGER.debug("Could not handle %s message: %s", cls.name, data)
